@@ -1,7 +1,5 @@
 package com.wizecore.tomcat.cdi;
 
-import org.hibernate.HibernateException;
-
 import javax.inject.Inject;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
@@ -38,8 +36,8 @@ public class TransactionInterceptor {
                     em.getTransaction().rollback();
                     logger.fine("Rolled back transaction");
                 }
-            } catch (HibernateException e1) {
-                logger.warning("Rollback of transaction failed -> " + e1);
+            } catch (Exception ee) {
+                logger.warning("Rollback of transaction failed -> " + ee);
             }
 
             throw e;
