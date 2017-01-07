@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 @Transactional
 public class TransactionInterceptor {
     @Inject
-    private EntityManagerStoreImpl entityManagerStore;
+    private EntityManagerStore entityManagerStore;
     private Logger logger = Logger.getLogger(TransactionInterceptor.class.getName());
 
     @AroundInvoke
@@ -29,7 +29,10 @@ public class TransactionInterceptor {
         try {
             em.getTransaction().begin();
             result = invocationContext.proceed();
-            em.getTransaction().commit();
+
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().commit();
+            }
         } catch (Exception e) {
             try {
                 if (em.getTransaction().isActive()) {
@@ -42,10 +45,8 @@ public class TransactionInterceptor {
 
             throw e;
         } finally {
-            if (em != null) {
-                entityManagerStore.unregister(em);
-                em.close();
-            }
+            entityManagerStore.unregister(em);
+            em.close();
         }
 
         return result;
